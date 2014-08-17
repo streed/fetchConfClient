@@ -1,3 +1,4 @@
+path = require 'path'
 log4js = require 'log4js'
 request = require 'request'
 Q = require 'q'
@@ -5,8 +6,10 @@ yaml = require 'js-yaml'
 fs = require 'fs'
 
 resolvePath = (string) ->
-  if string.substr(0,1) === '~'
-    homedir = (process.platform.substr(0, 3) === 'win') ? process.env.HOMEPATH : process.env.HOME
+  if string.substr(0,1) == '~'
+    homedir = process.env.HOME
+    if process.platform.substr(0, 3) == 'win'
+      homedir = process.env.HOMEPATH
     string = homedir + string.substr(1)
 
   return path.resolve(string)
@@ -28,6 +31,7 @@ class Client
     if not location
       location = '~/.local.config'
     location = resolvePath location
+    console.log location
     local = yaml.safeLoad(fs.readFileSync(location, 'utf8'))
     builder = InnerClient.Builder()
       .setClientId local.client_id
