@@ -1,0 +1,23 @@
+{
+  "name": "fetch-conf-client",
+  "version": "0.0.1",
+  "description": "Client to use fetchConfUi",
+  "main": "src/client",
+  "scripts": {
+    "test": "mocha --compilers coffee:coffee-script/register test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/streed/fetchConfClient.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/streed/fetchConfClient/issues"
+  },
+  "homepage": "https://github.com/streed/fetchConfClient",
+  "dependencies": {
+    "mocha": "^1.21.4",
+    "coffee-script": "^1.7.1"
+  }
+}
