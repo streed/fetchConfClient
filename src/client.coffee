@@ -3,6 +3,7 @@ request = require 'request'
 Q = require 'q'
 yaml = require 'js-yaml'
 fs = require 'fs'
+path = require 'path'
 
 root = exports ? this
 class Client
@@ -20,6 +21,7 @@ class Client
   @loadLocal: (location) ->
     if not location
       location = '~/.local.config'
+    location = path.resolve location
     local = yaml.safeLoad(fs.readFileSync(location, 'utf8'))
     builder = InnerClient.Builder()
       .setClientId local.client_id
