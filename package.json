@@ -2,7 +2,7 @@
   "name": "fetch-conf-client",
   "version": "0.0.1",
   "description": "Client to use fetchConfUi",
-  "main": "src/client",
+  "main": "lib/client",
   "scripts": {
     "test": "mocha --compilers coffee:coffee-script/register test/"
   },
