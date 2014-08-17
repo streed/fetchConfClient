@@ -37,7 +37,7 @@ class Client
       constructor: () ->
         @_clientId = ""
         @_clientSecret = ""
-        @_apiUri = "https://elt.li/"
+        @_apiUri = "http://elt.li/"
 
       setClientId: (@_clientId) ->
         @
@@ -49,7 +49,7 @@ class Client
         @
 
       build: (overrides) ->
-        client = new Client(@_clientId, @_clientSecret, @_apiUri)
+        client = new InnerClient(@_clientId, @_clientSecret, @_apiUri)
         return client.auth(overrides)
 
     @Builder: () ->
@@ -57,7 +57,7 @@ class Client
 
     constructor: (@_clientId, @_clientSecret, @_apiUri) ->
 
-    auth: () ->
+    auth: (overrides) ->
       authDeferred = Q.defer()
       data = {
         grant_type: "client_credentials"
@@ -69,14 +69,18 @@ class Client
         body = JSON.parse body
         self._accessToken = body.access_token
         self._refreshToken = body.refresh_token
+        self._config = {}
+        self._overrides = overrides
         authDeferred.resolve(self)
       return authDeferred.promise
 
     configs: () ->
       configsDeferred = Q.defer()
       url = @_apiUri + "api/config"
+      self = @
       request.get {url: url, headers: { "Authorization": "Bearer "+@_accessToken}}, (err, resp, body) ->
         body = JSON.parse body
+        self._config = body
         configsDeferred.resolve(body)
       return configsDeferred.promise
 
@@ -84,10 +88,18 @@ class Client
       configsDeferred = Q.defer()
       name = name.join(",")
       url = @_apiUri + "api/config/" + name
+      self = @
       request.get {url: url, headers: { "Authorization": "Bearer "+@_accessToken}}, (err, resp, body) ->
         body = JSON.parse body
+        self._config = body
         configsDeferred.resolve(body)
       return configsDeferred.promise
+
+    get: (key) ->
+      if key of @_overrides
+        return @_overrides[key]
+      else
+        return @_config[key]
 
 root.Client = Client
 
