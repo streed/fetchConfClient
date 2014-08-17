@@ -3,7 +3,13 @@ request = require 'request'
 Q = require 'q'
 yaml = require 'js-yaml'
 fs = require 'fs'
-path = require 'path'
+
+resolvePath = (string) ->
+  if string.substr(0,1) === '~'
+    homedir = (process.platform.substr(0, 3) === 'win') ? process.env.HOMEPATH : process.env.HOME
+    string = homedir + string.substr(1)
+
+  return path.resolve(string)
 
 root = exports ? this
 class Client
@@ -21,7 +27,7 @@ class Client
   @loadLocal: (location) ->
     if not location
       location = '~/.local.config'
-    location = path.resolve location
+    location = resolvePath location
     local = yaml.safeLoad(fs.readFileSync(location, 'utf8'))
     builder = InnerClient.Builder()
       .setClientId local.client_id
