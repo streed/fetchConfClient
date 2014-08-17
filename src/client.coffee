@@ -1,10 +1,13 @@
 log4js = require 'log4js'
 request = require 'request'
 Q = require 'q'
+yaml = require 'js-yaml'
+fs = require 'fs'
+
 root = exports ? this
 class Client
   instance = null
-  @get = (client_id, client_secret, api_url="http://elt.li") ->
+  @get: (client_id, client_secret, api_url="http://elt.li") ->
     if not instance
       instance = InnerClient.Builder()
         .setClientId(client_id)
@@ -13,6 +16,19 @@ class Client
         .build()
 
     return instance
+
+  @loadLocal: (location) ->
+    if not location
+      location = '~/.local.config'
+    local = yaml.safeLoad(fs.readFileSync(location, 'utf8'))
+    builder = InnerClient.Builder()
+      .setClientId local.client_id
+      .setClientSecret local.client_secret
+
+    if local.api_url
+      builder.setApiUri local.api_url
+
+    return builder.build(local.overrides)
 
   class InnerClient
     LOG = log4js.getLogger("client")
@@ -32,9 +48,9 @@ class Client
       setApiUri: (@_apiUri) ->
         @
 
-      build: () ->
+      build: (overrides) ->
         client = new Client(@_clientId, @_clientSecret, @_apiUri)
-        return client.auth()
+        return client.auth(overrides)
 
     @Builder: () ->
       return new InnerBuilder
@@ -74,3 +90,4 @@ class Client
       return configsDeferred.promise
 
 root.Client = Client
+
