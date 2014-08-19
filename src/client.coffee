@@ -28,19 +28,22 @@ class Client
     return instance
 
   @loadLocal: (location) ->
-    if not location
-      location = '~/.local.config'
-    location = resolvePath location
-    console.log location
-    local = yaml.safeLoad(fs.readFileSync(location, 'utf8'))
-    builder = InnerClient.Builder()
-      .setClientId local.client_id
-      .setClientSecret local.client_secret
+    if not instance
+      if not location
+        location = '~/.local.config'
+      location = resolvePath location
+      console.log location
+      local = yaml.safeLoad(fs.readFileSync(location, 'utf8'))
+      builder = InnerClient.Builder()
+        .setClientId local.client_id
+        .setClientSecret local.client_secret
 
-    if local.api_url
-      builder.setApiUri local.api_url
+      if local.api_url
+        builder.setApiUri local.api_url
 
-    return builder.build(local.overrides)
+      instance = builder.build(local.overrides)
+
+    return instance
 
   class InnerClient
     LOG = log4js.getLogger("client")
